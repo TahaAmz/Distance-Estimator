@@ -2,7 +2,6 @@ import cv2
 
 # Distance constants
 KNOWN_DISTANCE = 40.0 #Cm
-PERSON_WIDTH = 48.0 #Cm
 MOBILE_WIDTH = 8.0 #Cm
 
 # Object detector constant
@@ -44,9 +43,7 @@ def object_detector(image):
 
         # adding class id
         # 1: class name  2: object width in pixels  3: position where to draw distance
-        if classid == 0:  # person class id
-            data_list.append([class_names[classid], box[2], (box[0], box[1] - 2)])
-        elif classid == 67: # phone class id
+        if classid == 67: # phone class id
             data_list.append([class_names[classid], box[2], (box[0], box[1] - 2)])
 
     return data_list
@@ -62,20 +59,14 @@ def distance_finder(focal_length, real_object_width, width_in_frmae):
     return distance
 
 # reading the reference image from dir
-ref_person = cv2.imread('RefImages/image13.png')
 ref_mobile = cv2.imread('RefImages/image3.png')
 
 mobile_data = object_detector(ref_mobile)
 mobile_width_in_rf = mobile_data[0][1]
 
-person_data = object_detector(ref_person)
-person_width_in_rf = person_data[0][1]
-
-print(f"Person width in pixels : {person_width_in_rf} mobile width in pixel: {mobile_width_in_rf}")
+print(f"mobile width in pixel: {mobile_width_in_rf}")
 
 # finding focal length
-focal_person = focal_length_finder(KNOWN_DISTANCE, PERSON_WIDTH, person_width_in_rf)
-
 focal_mobile = focal_length_finder(KNOWN_DISTANCE, MOBILE_WIDTH, mobile_width_in_rf)
 cap = cv2.VideoCapture(0)
 while True:
@@ -83,10 +74,7 @@ while True:
 
     data = object_detector(frame)
     for d in data:
-        if d[0] == 'person':
-            distance = distance_finder(focal_person, PERSON_WIDTH, d[1])
-            x, y = d[2]
-        elif d[0] == 'cell phone':
+        if d[0] == 'cell phone':
             distance = distance_finder(focal_mobile, MOBILE_WIDTH, d[1])
             x, y = d[2]
         cv2.rectangle(frame, (x, y - 3), (x + 150, y + 23), BLACK, -1)
