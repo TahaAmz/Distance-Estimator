@@ -1,8 +1,8 @@
 import cv2
 
 # Distance constants
-KNOWN_DISTANCE = 60 #Cm
-PERSON_WIDTH = 48 #Cm
+KNOWN_DISTANCE = 40.0 #Cm
+PERSON_WIDTH = 48.0 #Cm
 MOBILE_WIDTH = 8.0 #Cm
 
 # Object detector constant
@@ -11,21 +11,19 @@ NMS_THRESHOLD = 0.3
 
 # colors for object detected
 COLORS = [(255,0,0),(255,0,255),(0, 255, 255), (255, 255, 0), (0, 255, 0), (255, 0, 0)]
-GREEN =(0,255,0)
-RED =(0,0,255)
+RED = (0,0,255)
+GREEN = (0,255,0)
 BLACK =(0,0,0)
 FONTS = cv2.FONT_HERSHEY_COMPLEX
 
 # getting class names from classes.txt file
-class_names = []
 with open("classes.txt", "r") as f:
     class_names = [cname.strip() for cname in f.readlines()]
-#  setttng up opencv net
-yoloNet = cv2.dnn.readNet('yolov4-tiny.weights', 'yolov4-tiny.cfg')
 
+#  setting up opencv net
+yoloNet = cv2.dnn.readNet('yolov4-tiny.weights', 'yolov4-tiny.cfg')
 yoloNet.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
 yoloNet.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
-
 model = cv2.dnn_DetectionModel(yoloNet)
 model.setInputParams(size=(416, 416), scale=1/255, swapRB=True)
 
@@ -40,30 +38,28 @@ def object_detector(image):
 
         label = "%s : %f" % (class_names[classid], score)
 
-        # draw rectangle on and label on object
-        cv2.rectangle(image, box, color, 2)
+        # draw rectangle and label on object
+        cv2.rectangle(image, box, color, 1)
         cv2.putText(image, label, (box[0], box[1] - 14), FONTS, 0.5, color, 2)
 
-        # getting the data
-        # 1: class name  2: object width in pixels, 3: position where have to draw text(distance)
+        # adding class id
+        # 1: class name  2: object width in pixels  3: position where to draw distance
         if classid == 0:  # person class id
             data_list.append([class_names[classid], box[2], (box[0], box[1] - 2)])
-        elif classid == 67:
+        elif classid == 67: # phone class id
             data_list.append([class_names[classid], box[2], (box[0], box[1] - 2)])
-        # if you want inclulde more classes then you have to simply add more [elif] statements here
-        # returning list containing the object data.
+
     return data_list
 
+# focal length finder function
 def focal_length_finder (measured_distance, real_width, width_in_rf):
     focal_length = (width_in_rf * measured_distance) / real_width
-
     return focal_length
 
 # distance finder function
 def distance_finder(focal_length, real_object_width, width_in_frmae):
     distance = (real_object_width * focal_length) / width_in_frmae
     return distance
-
 
 # reading the reference image from dir
 ref_person = cv2.imread('RefImages/image13.png')
