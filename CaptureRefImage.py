@@ -8,7 +8,6 @@ NMS_THRESHOLD = 0.5
 COLORS = [(0, 255, 255), (255, 255, 0), (0, 255, 0), (255, 0, 0)]
 GREEN = (0, 255, 0)
 RED = (0, 0, 255)
-PINK = (147, 20, 255)
 ORANGE = (0, 69, 255)
 fonts = cv2.FONT_HERSHEY_COMPLEX
 
@@ -32,7 +31,7 @@ def ObjectDetector(image):
         color = COLORS[int(classid) % len(COLORS)]
         label = "%s : %f" % (class_names[classid[0]], score)
         cv2.rectangle(image, box, color, 2)
-        cv2.putText(frame, label, (box[0], box[1]-10), fonts, 0.5, color, 2)
+        cv2.putText(frame, label, (box[0], box[1]-10), fonts, 0.5, ORANGE, 2)
 
 camera = cv2.VideoCapture(0)
 counter = 0
@@ -41,15 +40,15 @@ number = 0
 while True:
     ret, frame = camera.read()
 
-    orignal = frame.copy()
+    original = frame.copy()
     ObjectDetector(frame)
-    cv2.imshow('oringal', orignal)
+    cv2.imshow('original', original)
 
     print(capture == True and counter < 10)
     if capture == True and counter < 10:
         counter += 1
         cv2.putText(
-            frame, f"Capturing Img No: {number}", (30, 30), fonts, 0.6, PINK, 2)
+            frame, f"Capturing Img No: {number}", (30, 30), fonts, 0.6, ORANGE, 2)
     else:
         counter = 0
 
@@ -59,7 +58,7 @@ while True:
     if key == ord('c'):
         capture = True
         number += 1
-        cv2.imwrite(f'ReferenceImages/image{number}.png', orignal)
+        cv2.imwrite(f'ReferenceImages/image{number}.png', original)
     if key == ord('q'):
         break
 cv2.destroyAllWindows()
