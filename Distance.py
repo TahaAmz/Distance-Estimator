@@ -29,12 +29,10 @@ model.setInputParams(size=(416, 416), scale=1/255, swapRB=True)
 # object detector function
 def object_detector(image):
     classes, scores, boxes = model.detect(image, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
-    # creating empty list to add objects data
     data_list = []
     for (classid, score, box) in zip(classes, scores, boxes):
         # define color of each, object based on its class id
         color = COLORS[int(classid) % len(COLORS)]
-
         label = "%s : %f" % (class_names[classid], score)
 
         # draw rectangle and label on object
@@ -60,10 +58,8 @@ def distance_finder(focal_length, real_object_width, width_in_frmae):
 
 # reading the reference image from dir
 ref_mobile = cv2.imread('RefImages/image3.png')
-
 mobile_data = object_detector(ref_mobile)
 mobile_width_in_rf = mobile_data[0][1]
-
 print(f"mobile width in pixel: {mobile_width_in_rf}")
 
 # finding focal length
@@ -77,6 +73,7 @@ while True:
         if d[0] == 'cell phone':
             distance = distance_finder(focal_mobile, MOBILE_WIDTH, d[1])
             x, y = d[2]
+
         cv2.rectangle(frame, (x, y - 3), (x + 150, y + 23), BLACK, -1)
         cv2.putText(frame, f'Dis: {round(distance, 2)} Cm', (x + 5, y + 13), FONTS, 0.38, RED, 1)
 
@@ -85,5 +82,6 @@ while True:
     key = cv2.waitKey(1)
     if key == ord('q'):
         break
+        
 cv2.destroyAllWindows()
 cap.release()
