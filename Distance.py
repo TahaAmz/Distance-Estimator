@@ -1,4 +1,6 @@
 import cv2
+from ultralytics import YOLO
+from ultralytics.models.yolo.detect.predict import DetectionPredictor
 
 # Distance constants
 KNOWN_DISTANCE = 40.0 #Cm
@@ -19,7 +21,7 @@ FONTS = cv2.FONT_HERSHEY_COMPLEX
 with open("classes.txt", "r") as f:
     class_names = [cname.strip() for cname in f.readlines()]
 
-#  setting up opencv net
+# setting up opencv net with YOLOv4
 yoloNet = cv2.dnn.readNet('yolov4-tiny.weights', 'yolov4-tiny.cfg')
 yoloNet.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
 yoloNet.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
