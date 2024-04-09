@@ -17,9 +17,9 @@ RED = (0,0,255)
 BLACK =(0,0,0)
 FONT = cv2.FONT_HERSHEY_COMPLEX
 
-# getting class names from classes.txt file
-with open("classes.txt", "r") as f:
-    class_names = [cname.strip() for cname in f.readlines()]
+# getting class names from coco.txt and setting up YOLOv5
+with open("coco.txt", "r") as f:
+    class_names = [cName.strip() for cName in f.readlines()]
 
 # setting up opencv net with YOLOv4
 yoloNet = cv2.dnn.readNet('yolov4-tiny.weights', 'yolov4-tiny.cfg')
@@ -35,7 +35,7 @@ def object_detector(image):
     for (classid, score, box) in zip(classes, scores, boxes):
         # define color of each, object based on its class id
         color = COLORS[int(classid) % len(COLORS)]
-        label = "%s : %f" % (class_names[classid], score)
+        label = f"{class_names[classid]}"
 
         # draw rectangle and label on object
         cv2.rectangle(image, box, color, 1)
@@ -59,16 +59,16 @@ def distance_finder(focal_length, real_object_width, width_in_frmae):
     return distance
 
 # reading the reference image and finging focal length
-ref_mobile = cv2.imread("RefImages\image3.png")
-mobile_data = object_detector(ref_mobile)
-mobile_width_in_rf = mobile_data[0][1]
-print(f"mobile width in pixel: {mobile_width_in_rf}")
-focal_mobile = focal_length_finder(KNOWN_DISTANCE, MOBILE_WIDTH, mobile_width_in_rf)
+mobile_ref = cv2.imread("RefImages\image3.png")
+mobile_data = object_detector(mobile_ref)
+mobile_width_in_pxl = mobile_data[0][1]
+focal_mobile = focal_length_finder(KNOWN_DISTANCE, MOBILE_WIDTH, mobile_width_in_pxl)
 
 # connecting to camera and begin the detection
 # url_cap = "http://192.168.62.215:8080"
 # frame_cap = cv2.VideoCapture(url_cap + "/video")
 frame_cap = cv2.VideoCapture(0)
+
 while True:
     ret, frame = frame_cap.read()
     data = object_detector(frame)
